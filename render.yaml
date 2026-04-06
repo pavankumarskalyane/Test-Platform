@@ -1,0 +1,37 @@
+services:
+  # Backend API Web Service
+  - type: web
+    name: test-platform-api
+    env: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        sync: false # Requires manual setup in Render Dashboard
+      - key: JWT_SECRET
+        sync: false # Requires manual setup in Render Dashboard
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: test-platform-ui
+          property: url
+
+  # Frontend Static Site
+  - type: web
+    name: test-platform-ui
+    env: static
+    rootDir: client
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: test-platform-api
+          property: url
+          # Render will automatically append /api if we wanted, but we need to supply /api here. Since `property: url` gives the root domain, we can either append it in code or here.
+          # Actually, fromService url property does not let us append path natively in `render.yaml`.
+          # It's better to update axios to append `/api` if missing, or just let Render provide the base URL.
