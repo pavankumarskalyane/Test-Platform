@@ -21,8 +21,7 @@ export const registerUser = async (req, res) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        // FOR EXPERIMENTATION: Setting all new users to 'admin' so you can test the Admin Panel
-        const userRole = 'admin';
+        const userRole = role === 'admin' ? 'admin' : 'user';
 
         const user = await User.create({
             name,
